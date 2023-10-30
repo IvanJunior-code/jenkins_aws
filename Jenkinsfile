@@ -5,7 +5,7 @@ pipeline {
         stage ('Build Image') {
             steps {
                 script {
-                    dockerapp = docker.build("fabricioveronez/web-live-app:${env.BUILD_ID}", "-f ./src/Dockerfile ./src")
+                    dockerapp = docker.build("ivanjuniordocker/web-app:${env.BUILD_ID}", "-f ./src/Dockerfile ./src")
                 }
             }
         }
@@ -29,13 +29,13 @@ pipeline {
                 # Configurar o AWS CLI
                 withAWS(credentials: 'jenkins-credential', region: 'us-east-1') {
 
-                    # Configurar o kubectl
+                    // Configurar o kubectl
                     sh 'aws eks update-kubeconfig --name live-eks'
 
-                    # Configurar a imagem gerada no deployment.yaml
+                    // Configurar a imagem gerada no deployment.yaml
                     sh 'sed -i "s/{{tag}}/$tag_version/g" ./k8s/deployment.yaml'
 
-                    # Aplicar o deploy
+                    // Aplicar o deploy
                     sh 'kubectl apply -f ./k8s/deployment.yaml'
                 }
             }
